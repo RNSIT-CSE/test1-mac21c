@@ -1,0 +1,33 @@
+name: Autograding Tests
+'on':
+- push
+- workflow_dispatch
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: test5
+      id: test5
+      uses: education/autograding-io-grader@v1
+      with:
+        test-name: test5
+        setup-command: gcc main.c
+        command: "./a.out"
+        input: "5\r\n6"
+        expected-output: '11'
+        comparison-method: contains
+        timeout: 1
+    - name: Autograding Reporter
+      uses: education/autograding-grading-reporter@v1
+      env:
+        TEST5_RESULTS: "${{steps.test5.outputs.result}}"
+      with:
+        runners: test5
